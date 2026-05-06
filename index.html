@@ -1,0 +1,566 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maths Q</title>
+<style>
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Inter", Arial, sans-serif;
+        background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #ffffff 100%);
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .app-shell {
+        width: min(100%, 480px);
+        margin: 0 auto;
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 28px;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+        overflow: hidden;
+    }
+
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 20px;
+        background: #2563eb;
+        color: white;
+    }
+
+    .top-bar strong {
+        display: block;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .top-bar span {
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        padding: 16px 20px 0;
+    }
+
+    .status-chip {
+        background: #f8fafc;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 18px;
+        padding: 12px 14px;
+        text-align: center;
+    }
+
+    .status-chip strong {
+        display: block;
+        font-size: 1rem;
+    }
+
+    .status-chip small {
+        color: #475569;
+        font-size: 0.8rem;
+    }
+
+    .login-screen,
+    .quiz-screen {
+        padding: 24px 20px 28px;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 24px;
+        padding: 28px 24px;
+        text-align: center;
+    }
+
+    .login-card h1,
+    .quiz-card h1 {
+        margin: 0 0 16px;
+        font-size: 1.8rem;
+    }
+
+    .login-card p,
+    .quiz-card p {
+        margin: 0 0 24px;
+        color: #475569;
+        line-height: 1.6;
+    }
+
+    .form-group {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid #cbd5e1;
+        font-size: 1rem;
+    }
+
+    .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 22px;
+    }
+
+    button,
+    .link-button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        border-radius: 999px;
+        padding: 14px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .link-button {
+        background: transparent;
+        color: #2563eb;
+        border: 1px solid rgba(37, 99, 235, 0.25);
+    }
+
+    button:hover,
+    .link-button:hover {
+        transform: translateY(-1px);
+    }
+
+    .question {
+        font-size: clamp(1.4rem, 2.7vw, 1.9rem);
+        margin: 0 0 18px;
+        line-height: 1.35;
+    }
+
+    .option {
+        display: block;
+        background: #f8fafc;
+        margin: 10px 0;
+        padding: 18px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        font-size: 1rem;
+        border: 1px solid transparent;
+    }
+
+    .option:hover {
+        background: #e2e8f0;
+        transform: translateY(-1px);
+    }
+
+    .option.correct {
+        background: #16a34a;
+        color: white;
+        border-color: #0f766e;
+    }
+
+    .option.wrong {
+        background: #dc2626;
+        color: white;
+        border-color: #991b1b;
+    }
+
+    .option.disabled {
+        pointer-events: none;
+        opacity: 0.85;
+    }
+
+    .message-box {
+        margin-top: 18px;
+        min-height: 28px;
+        color: #334155;
+        font-size: 0.98rem;
+    }
+
+    .message-box strong {
+        color: #0f172a;
+    }
+
+    .summary {
+        padding: 24px 20px 28px;
+    }
+
+    .summary h2 {
+        margin: 0 0 14px;
+        font-size: 1.8rem;
+    }
+
+    .summary p {
+        margin: 0 0 18px;
+        color: #475569;
+        line-height: 1.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @media (max-width: 480px) {
+        .top-bar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .status-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .button-row {
+            justify-content: stretch;
+        }
+
+        button,
+        .link-button {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="app-shell">
+    <div class="card">
+        <div class="top-bar">
+            <div>
+                <strong>Logged in as</strong>
+                <span id="usernameDisplay">Guest</span>
+            </div>
+            <button class="link-button" id="signOutBtn" onclick="signOut()">Sign Out</button>
+        </div>
+
+        <div class="status-grid quiz-screen" id="quizScreen">
+            <div class="status-chip">
+                <small>Score</small>
+                <strong id="scoreDisplay">0</strong>
+            </div>
+            <div class="status-chip">
+                <small>Time left</small>
+                <strong id="timerDisplay">18s</strong>
+            </div>
+            <div class="status-chip">
+                <small>Progress</small>
+                <strong id="progressDisplay">0 / 0</strong>
+            </div>
+        </div>
+
+        <div class="login-screen" id="loginScreen">
+            <div class="login-card">
+                <h1>Welcome Back</h1>
+                <p>Enter your name to start the quiz. Your score and session progress are tracked locally.</p>
+                <form id="loginForm" onsubmit="submitLogin(event)">
+                    <div class="form-group">
+                        <input id="usernameInput" type="text" placeholder="Your name" autocomplete="name" required />
+                    </div>
+                    <button type="submit">Start Quiz</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="quiz-screen hidden" id="quizContainer">
+            <div class="question" id="question">Question will appear here</div>
+            <div id="options"></div>
+            <div class="message-box" id="messageBox">Choose the correct answer before time runs out.</div>
+            <div class="button-row">
+                <button id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+                <button class="link-button" onclick="restartQuiz()">Restart</button>
+            </div>
+        </div>
+
+        <div class="summary hidden" id="summaryScreen">
+            <div id="summaryContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    { question: "What is 2 + 2?", options: ["2", "3", "4", "5"], answer: 2 },
+    { question: "What is 5 × 6?", options: ["11", "30", "35", "20"], answer: 1 },
+    { question: "What is 12 − 7?", options: ["4", "5", "6", "7"], answer: 1 },
+    { question: "What is 9 + 8?", options: ["16", "17", "18", "15"], answer: 1 },
+    { question: "What is 15 ÷ 3?", options: ["3", "4", "5", "6"], answer: 2 },
+    { question: "What is 7 × 7?", options: ["42", "49", "56", "36"], answer: 1 },
+    { question: "What is 18 − 9?", options: ["7", "8", "9", "10"], answer: 2 },
+    { question: "What is 14 + 6?", options: ["18", "19", "20", "21"], answer: 2 },
+    { question: "What is the value of 4²?", options: ["8", "12", "16", "20"], answer: 2 },
+    { question: "What is 25 ÷ 5?", options: ["3", "4", "5", "6"], answer: 2 },
+    { question: "What is 11 + 13?", options: ["22", "23", "24", "25"], answer: 2 },
+    { question: "What is 20 − 8?", options: ["11", "12", "13", "14"], answer: 1 },
+    { question: "What is 6 × 8?", options: ["42", "46", "48", "54"], answer: 2 },
+    { question: "What is 45 ÷ 9?", options: ["4", "5", "6", "7"], answer: 1 },
+    { question: "What is 3³?", options: ["6", "9", "18", "27"], answer: 3 },
+    { question: "What is 17 + 5?", options: ["20", "21", "22", "23"], answer: 2 },
+    { question: "What is 28 − 12?", options: ["14", "15", "16", "17"], answer: 2 },
+    { question: "What is 8 × 9?", options: ["64", "70", "72", "80"], answer: 2 },
+    { question: "What is 49 ÷ 7?", options: ["5", "6", "7", "8"], answer: 2 },
+    { question: "What is 13 + 14?", options: ["25", "26", "27", "28"], answer: 2 },
+    { question: "What is 34 − 17?", options: ["15", "16", "17", "18"], answer: 2 },
+    { question: "What is 9 × 5?", options: ["35", "40", "42", "45"], answer: 3 },
+    { question: "What is 64 ÷ 8?", options: ["6", "7", "8", "9"], answer: 2 },
+    { question: "What is 2³?", options: ["4", "6", "8", "10"], answer: 2 },
+    { question: "What is 21 + 19?", options: ["38", "39", "40", "41"], answer: 0 },
+    { question: "What is 50 − 23?", options: ["26", "27", "28", "29"], answer: 1 },
+    { question: "What is 7 × 11?", options: ["66", "69", "72", "77"], answer: 3 },
+    { question: "What is 81 ÷ 9?", options: ["8", "9", "10", "11"], answer: 1 },
+    { question: "What is 5²?", options: ["10", "15", "20", "25"], answer: 3 },
+    { question: "What is 22 + 18?", options: ["39", "40", "41", "42"], answer: 3 },
+    { question: "What is 36 − 15?", options: ["19", "20", "21", "22"], answer: 2 },
+    { question: "What is 4 × 12?", options: ["40", "44", "46", "48"], answer: 3 },
+    { question: "What is 72 ÷ 8?", options: ["7", "8", "9", "10"], answer: 2 },
+    { question: "What is 6²?", options: ["30", "32", "34", "36"], answer: 3 },
+    { question: "What is 29 + 16?", options: ["43", "44", "45", "46"], answer: 0 },
+    { question: "What is 70 − 28?", options: ["40", "42", "44", "45"], answer: 1 },
+    { question: "What is 9 × 6?", options: ["48", "52", "54", "56"], answer: 2 },
+    { question: "What is 90 ÷ 10?", options: ["8", "9", "10", "11"], answer: 2 },
+    { question: "What is 8²?", options: ["54", "56", "64", "72"], answer: 2 },
+    { question: "What is 31 + 12?", options: ["42", "43", "44", "45"], answer: 1 },
+    { question: "What is 55 − 29?", options: ["24", "25", "26", "27"], answer: 2 },
+    { question: "What is 7 × 9?", options: ["54", "56", "60", "63"], answer: 3 },
+    { question: "What is 100 ÷ 25?", options: ["2", "3", "4", "5"], answer: 2 },
+    { question: "What is 10²?", options: ["90", "95", "100", "105"], answer: 2 },
+    { question: "What is 24 + 17?", options: ["39", "40", "41", "42"], answer: 0 },
+    { question: "What is 48 − 19?", options: ["27", "28", "29", "30"], answer: 2 },
+    { question: "What is 5 × 13?", options: ["55", "60", "65", "70"], answer: 0 },
+    { question: "What is 96 ÷ 12?", options: ["6", "7", "8", "9"], answer: 2 },
+    { question: "What is 11²?", options: ["111", "121", "131", "141"], answer: 1 },
+    { question: "What is 27 + 18?", options: ["44", "45", "46", "47"], answer: 1 },
+    { question: "What is 63 − 25?", options: ["36", "37", "38", "39"], answer: 1 },
+    { question: "What is 8 × 7?", options: ["52", "54", "56", "58"], answer: 2 },
+    { question: "What is 45 ÷ 5?", options: ["8", "9", "10", "11"], answer: 1 },
+    { question: "What is 12²?", options: ["132", "144", "152", "162"], answer: 1 }
+];
+
+const totalQuestions = quizData.length;
+const questionTime = 18;
+let currentQuestion = 0;
+let score = 0;
+let timeLeft = questionTime;
+let timerInterval = null;
+let username = "Guest";
+let answerLocked = false;
+
+const usernameDisplay = document.getElementById("usernameDisplay");
+const scoreDisplay = document.getElementById("scoreDisplay");
+const timerDisplay = document.getElementById("timerDisplay");
+const progressDisplay = document.getElementById("progressDisplay");
+const questionElement = document.getElementById("question");
+const optionsElement = document.getElementById("options");
+const messageBox = document.getElementById("messageBox");
+const nextBtn = document.getElementById("nextBtn");
+const loginScreen = document.getElementById("loginScreen");
+const quizContainer = document.getElementById("quizContainer");
+const summaryScreen = document.getElementById("summaryScreen");
+const summaryContent = document.getElementById("summaryContent");
+const signOutBtn = document.getElementById("signOutBtn");
+
+function refreshHeader() {
+    usernameDisplay.innerText = username;
+    scoreDisplay.innerText = score;
+    progressDisplay.innerText = `${currentQuestion + 1} / ${totalQuestions}`;
+}
+
+function startTimer() {
+    stopTimer();
+    timeLeft = questionTime;
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeLeft -= 1;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+            stopTimer();
+            lockOptions();
+            revealCorrectAnswer();
+            messageBox.innerHTML = "<strong>Time's up!</strong> The correct answer is highlighted.";
+            nextBtn.disabled = false;
+        }
+    }, 1000);
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function updateTimerDisplay() {
+    timerDisplay.innerText = `${timeLeft}s`;
+}
+
+function updateScore() {
+    scoreDisplay.innerText = score;
+}
+
+function lockOptions() {
+    answerLocked = true;
+    document.querySelectorAll(".option").forEach(opt => {
+        opt.classList.add("disabled");
+        opt.onclick = null;
+    });
+}
+
+function revealCorrectAnswer(selectedIndex = null) {
+    const correctIndex = quizData[currentQuestion].answer;
+    document.querySelectorAll(".option").forEach((opt, i) => {
+        if (i === correctIndex) {
+            opt.classList.add("correct");
+        }
+        if (selectedIndex !== null && i === selectedIndex && i !== correctIndex) {
+            opt.classList.add("wrong");
+        }
+        opt.classList.add("disabled");
+        opt.onclick = null;
+    });
+}
+
+function loadQuestion() {
+    answerLocked = false;
+    nextBtn.disabled = true;
+    summaryScreen.classList.add("hidden");
+    quizContainer.classList.remove("hidden");
+    loginScreen.classList.add("hidden");
+    const q = quizData[currentQuestion];
+    questionElement.innerText = q.question;
+    optionsElement.innerHTML = "";
+    q.options.forEach((text, index) => {
+        const option = document.createElement("div");
+        option.className = "option";
+        option.innerText = text;
+        option.onclick = () => selectAnswer(index);
+        optionsElement.appendChild(option);
+    });
+    refreshHeader();
+    messageBox.innerText = "Choose the best answer before time runs out.";
+    startTimer();
+}
+
+function selectAnswer(index) {
+    if (answerLocked) return;
+    stopTimer();
+    answerLocked = true;
+    const correctIndex = quizData[currentQuestion].answer;
+    if (index === correctIndex) {
+        score += 10;
+        messageBox.innerHTML = "<strong>Correct!</strong> Great job.";
+    } else {
+        messageBox.innerHTML = "<strong>Oops!</strong> The correct answer is shown in green.";
+    }
+    revealCorrectAnswer(index);
+    updateScore();
+    nextBtn.disabled = false;
+}
+
+function nextQuestion() {
+    if (!answerLocked) {
+        messageBox.innerText = "Tap an answer first or let the timer run out.";
+        return;
+    }
+    if (currentQuestion + 1 < totalQuestions) {
+        currentQuestion += 1;
+        loadQuestion();
+    } else {
+        finishQuiz();
+    }
+}
+
+function finishQuiz() {
+    stopTimer();
+    quizContainer.classList.add("hidden");
+    summaryScreen.classList.remove("hidden");
+    loginScreen.classList.add("hidden");
+    summaryContent.innerHTML = `
+        <h2>Quiz Complete</h2>
+        <p>Well done, <strong>${username}</strong>! You scored <strong>${score}</strong> points out of <strong>${totalQuestions * 10}</strong>.</p>
+        <p>Your final progress was <strong>${totalQuestions} / ${totalQuestions}</strong>.</p>
+        <div class="button-row">
+            <button onclick="restartQuiz()">Play Again</button>
+            <button class="link-button" onclick="signOut()">Sign Out</button>
+        </div>
+    `;
+}
+
+function restartQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    updateScore();
+    refreshHeader();
+    summaryScreen.classList.add("hidden");
+    quizContainer.classList.remove("hidden");
+    loadQuestion();
+}
+
+function submitLogin(event) {
+    event.preventDefault();
+    const value = document.getElementById("usernameInput").value.trim();
+    if (!value) return;
+    username = value;
+    localStorage.setItem("mathsQUsername", username);
+    loginScreen.classList.add("hidden");
+    quizContainer.classList.remove("hidden");
+    signOutBtn.style.display = "inline-flex";
+    refreshHeader();
+    loadQuestion();
+}
+
+function signOut() {
+    localStorage.removeItem("mathsQUsername");
+    username = "Guest";
+    score = 0;
+    currentQuestion = 0;
+    stopTimer();
+    quizContainer.classList.add("hidden");
+    summaryScreen.classList.add("hidden");
+    loginScreen.classList.remove("hidden");
+    messageBox.innerText = "Choose the best answer before time runs out.";
+    usernameDisplay.innerText = username;
+    scoreDisplay.innerText = score;
+    timerDisplay.innerText = `${questionTime}s`;
+    progressDisplay.innerText = `0 / ${totalQuestions}`;
+    signOutBtn.style.display = "none";
+}
+
+function initApp() {
+    const storedUser = localStorage.getItem("mathsQUsername");
+    if (storedUser) {
+        username = storedUser;
+        signOutBtn.style.display = "inline-flex";
+        loginScreen.classList.add("hidden");
+        quizContainer.classList.remove("hidden");
+        refreshHeader();
+        loadQuestion();
+    } else {
+        signOutBtn.style.display = "none";
+        quizContainer.classList.add("hidden");
+        summaryScreen.classList.add("hidden");
+    }
+}
+
+initApp();
+</script>
+</body>
+</html>
